@@ -7,7 +7,7 @@ const User = require("../models/userModel");
 /**
  * @description Register a new user
  * @access      Public
- * @route       api/users
+ * @route       POST api/users
  */
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -52,7 +52,7 @@ const registerUser = asyncHandler(async (req, res) => {
 /**
  * @description Login a user
  * @access      Public
- * @route       api/users/login
+ * @route       POST api/users/login
  */
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -77,7 +77,7 @@ const loginUser = asyncHandler(async (req, res) => {
 /**
  * @description Get current user
  * @access      Private
- * @route       api/users/me
+ * @route       GET api/users/me
  */
 const getMe = asyncHandler(async (req, res) => {
   const user = {
