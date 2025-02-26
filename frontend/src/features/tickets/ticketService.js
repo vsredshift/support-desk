@@ -23,7 +23,7 @@ const getTickets = async (token) => {
 
   const response = await axios.get(API_URL, config);
   return response.data;
-}
+};
 
 const getTicket = async (ticketId, token) => {
   const config = {
@@ -34,12 +34,44 @@ const getTicket = async (ticketId, token) => {
 
   const response = await axios.get(API_URL + ticketId, config);
   return response.data;
-}
+};
+
+const closeTicket = async (ticketId, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  const response = await axios.put(
+    API_URL + ticketId,
+    { status: "closed" },
+    config
+  );
+  return response.data;
+};
+
+const reopenTicket = async (ticketId, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  const response = await axios.put(
+    API_URL + ticketId,
+    { status: "open" },
+    config
+  );
+  return response.data;
+};
 
 const ticketService = {
-    createTicket,
-    getTickets,
-    getTicket,
-}
+  createTicket,
+  getTickets,
+  getTicket,
+  closeTicket,
+  reopenTicket,
+};
 
 export default ticketService;
