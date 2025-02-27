@@ -31,9 +31,9 @@ const Tickets = () => {
                 <div>Status</div>
                 <div></div>
             </div>
-            {tickets.map((ticket) => (
+            {tickets && tickets.length > 0 ? (tickets.map((ticket) => (
                 <TicketItem key={ticket._id} ticket={ticket}/>
-            ))}
+            ))) : <p>No tickets to show</p>}
         </div>
     </>
   )

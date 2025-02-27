@@ -10,13 +10,12 @@ const Note = require("../models/noteModel");
 const getNotes = asyncHandler(async (req, res) => {
   const ticket = await Ticket.findById(req.params.ticketId);
 
-  if (ticket.user.toString() !== req.user.id) {
-    res.status(401);
-    throw new Error("User not authorised");
+  if (!ticket || ticket.user.toString() !== req.user.id) {
+    res.status(401).json({ message: "User not authorised" });
+    return;
   }
 
-  const notes = await Note.find({ ticket });
-
+  const notes = await Note.find({ ticket: ticket._id });
   res.status(200).json(notes);
 });
 
@@ -28,24 +27,25 @@ const getNotes = asyncHandler(async (req, res) => {
 const addNote = asyncHandler(async (req, res) => {
   const ticket = await Ticket.findById(req.params.ticketId);
 
-  if (ticket.user.toString() !== req.user.id) {
-    res.status(401);
-    throw new Error("User not authorised");
+  if (!ticket || ticket.user.toString() !== req.user.id) {
+    res.status(401).json({ message: "User not authorised" });
+    return;
   }
 
-  if (!req.body.text || req.body.text.trim() === "") {
-    res.status(400);
-    throw new Error("Note content cannot be empty");
+  const { text } = req.body;
+  if (!text || text.trim() === "") {
+    res.status(400).json({ message: "Note content cannot be empty" });
+    return;
   }
 
   const note = await Note.create({
-    text: req.body.text,
+    text: text.trim(),
     isStaff: false,
-    ticket: req.params.ticketId,
+    ticket: ticket._id,
     user: req.user.id,
   });
 
-  res.status(200).json(note);
+  res.status(201).json(note);
 });
 
 module.exports = {

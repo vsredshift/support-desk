@@ -1,7 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
 const User = require("../models/userModel");
 
 /**
@@ -18,23 +17,15 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("Please include all fields");
   }
 
-  // Find if user already exists
-  const userExists = await User.findOne({ email });
-  if (userExists) {
+  // Check if user already exists
+  if (await User.findOne({ email })) {
     res.status(400);
     throw new Error("User already exists.");
   }
 
-  // Hash password
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-
-  // Create user
-  const user = await User.create({
-    name,
-    email,
-    password: hashedPassword,
-  });
+  // Hash password and create user
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = await User.create({ name, email, password: hashedPassword });
 
   if (user) {
     res.status(201).json({
@@ -56,9 +47,7 @@ const registerUser = asyncHandler(async (req, res) => {
  */
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-
   const user = await User.findOne({ email });
-  console.log(`Found user ${user}`);
 
   // Check if user and password match
   if (user && (await bcrypt.compare(password, user.password))) {
@@ -80,21 +69,12 @@ const loginUser = asyncHandler(async (req, res) => {
  * @route       GET api/users/me
  */
 const getMe = asyncHandler(async (req, res) => {
-  const user = {
-    id: req.user._id,
-    name: req.user.name,
-    email: req.user.email,
-  };
-
-  res.status(200).json(user);
+  const { _id, name, email } = req.user;
+  res.status(200).json({ id: _id, name, email });
 });
 
 // Generate Token
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: "30d",
-  });
-};
+const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 
 module.exports = {
   registerUser,
