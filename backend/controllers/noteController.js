@@ -33,6 +33,11 @@ const addNote = asyncHandler(async (req, res) => {
     throw new Error("User not authorised");
   }
 
+  if (!req.body.text || req.body.text.trim() === "") {
+    res.status(400);
+    throw new Error("Note content cannot be empty");
+  }
+
   const note = await Note.create({
     text: req.body.text,
     isStaff: false,
