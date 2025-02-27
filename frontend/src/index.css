@@ -187,6 +187,19 @@ h3 {
   color: grey;
 }
 
+.btn-ticket-order {
+  border: 1px solid #777;
+  border-radius: 8px;
+  background-color: #f4f4f4;
+  color: black;
+  align-self: center;
+}
+
+.btn-ticket-order:hover {
+  color: #777;
+  transform: scale(0.96);
+}
+
 .btn-back {
   width: 150px;
   margin-bottom: 20px;
