@@ -4,7 +4,8 @@ import Modal from "react-modal";
 import {
   getTicket,
   closeTicket,
-  reopenTicket,
+  openTicket,
+  reset,
 } from "../features/tickets/ticketSlice";
 import {
   createNote,
@@ -68,7 +69,7 @@ function Ticket() {
   };
 
   const onReopenTicket = () => {
-    dispatch(reopenTicket(ticketId));
+    dispatch(openTicket(ticketId));
     toast.success("Ticket reopened");
     navigate("/tickets");
   };
@@ -88,6 +89,8 @@ function Ticket() {
   const onNoteSubmit = (e) => {
     e.preventDefault();
     dispatch(createNote({ noteText, ticketId }));
+    dispatch(openTicket(ticketId));
+    dispatch(reset());
     closeModal();
   };
 
@@ -119,23 +122,25 @@ function Ticket() {
           <p>{ticket.description}</p>
         </div>
         <hr />
-        <div className="note-header">
-          <h2>Notes</h2>
+        <h2>Notes</h2>
+      </header>
+
+      <div className="note-header">
+        {ticket.status !== "closed" && (
+          <button className="btn" onClick={openModal}>
+            <FaPlus />
+            Add Note
+          </button>
+        )}
+        {notes.length > 0 && (
           <button
             className="btn btn-note-order btn-sm"
             onClick={toggleSortOrder}
           >
             Show {sortOrder === "asc" ? "newest" : "oldest"} first
           </button>
-        </div>
-      </header>
-
-      {ticket.status !== "closed" && (
-        <button className="btn" onClick={openModal}>
-          <FaPlus />
-          Add Note
-        </button>
-      )}
+        )}
+      </div>
 
       <Modal
         isOpen={isModalOpen}
@@ -162,7 +167,9 @@ function Ticket() {
               </button>
             </div>
             <div className="form-group">
-              <button className="btn btn-danger" onClick={closeModal}>Cancel</button>
+              <button className="btn btn-danger" onClick={closeModal}>
+                Cancel
+              </button>
             </div>
           </div>
         </form>
@@ -187,6 +194,8 @@ function Ticket() {
           Re-open ticket
         </button>
       )}
+      <br />
+      <br />
     </div>
   );
 }

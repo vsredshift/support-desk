@@ -51,7 +51,7 @@ const closeTicket = async (ticketId, token) => {
   return response.data;
 };
 
-const reopenTicket = async (ticketId, token) => {
+const openTicket = async (ticketId, token) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -71,7 +71,7 @@ const ticketService = {
   getTickets,
   getTicket,
   closeTicket,
-  reopenTicket,
+  openTicket,
 };
 
 export default ticketService;

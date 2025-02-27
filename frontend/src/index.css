@@ -184,7 +184,7 @@ h3 {
 .btn-note-order {
   border: none;
   background: #fff;
-  color: blue;
+  color: grey;
 }
 
 .btn-back {
@@ -324,7 +324,6 @@ h3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 0;
 }
 
 .modal-buttons {
