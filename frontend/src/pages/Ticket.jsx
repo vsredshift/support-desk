@@ -1,14 +1,24 @@
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import { getTicket, reset, closeTicket, reopenTicket } from "../features/tickets/ticketSlice";
+import {
+  getTicket,
+  reset,
+  closeTicket,
+  reopenTicket,
+} from "../features/tickets/ticketSlice";
+import { getNotes, reset as notesReset } from "../features/notes/noteSlice";
 import BackButton from "../components/BackButton";
 import Spinner from "../components/Spinner";
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import NoteItem from "../components/NoteItem";
 
 function Ticket() {
   const { ticket, isSuccess, isError, isLoading, message } = useSelector(
     (state) => state.tickets
+  );
+  const { notes, isLoading: notesIsLoading } = useSelector(
+    (state) => state.notes
   );
 
   const params = useParams();
@@ -23,6 +33,7 @@ function Ticket() {
     }
 
     dispatch(getTicket(ticketId));
+    dispatch(getNotes(ticketId));
     // eslint-disable-next-line
   }, [isError, message, ticketId, isSuccess]);
 
@@ -36,9 +47,9 @@ function Ticket() {
     dispatch(reopenTicket(ticketId));
     toast.success("Ticket reopened");
     navigate("/tickets");
-  }
+  };
 
-  if (isLoading) {
+  if (isLoading || notesIsLoading) {
     return <Spinner />;
   }
 
@@ -65,14 +76,21 @@ function Ticket() {
           <h3>Description of the issue</h3>
           <p>{ticket.description}</p>
         </div>
+        <h2>Notes</h2>
       </header>
+
+      {notes.length === 0 ? "No notes yet" : notes.map((note) => (
+        <NoteItem key={note._id} note={note} />
+      ))}
 
       {ticket.status !== "closed" ? (
         <button className="btn btn-block btn-danger" onClick={onTicketClose}>
           Close Ticket
         </button>
       ) : (
-        <button className="btn btn-block btn-reopen" onClick={onReopenTicket}>Re-open ticket</button>
+        <button className="btn btn-block btn-reopen" onClick={onReopenTicket}>
+          Re-open ticket
+        </button>
       )}
     </div>
   );
