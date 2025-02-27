@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/ReactToastify.css";
 import Header from "./components/Header";
 import Home from "./pages/Home";
@@ -47,7 +47,7 @@ function App() {
           </Routes>
         </div>
       </Router>
-      <ToastContainer />
+      <ToastContainer transition={Slide} autoClose={1600} hideProgressBar={true}/>
     </>
   );
 }
