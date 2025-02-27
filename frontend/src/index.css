@@ -181,6 +181,12 @@ h3 {
   border: none;
 }
 
+.btn-note-order {
+  border: none;
+  background: #fff;
+  color: grey;
+}
+
 .btn-back {
   width: 150px;
   margin-bottom: 20px;
@@ -312,6 +318,20 @@ h3 {
   top: 15px;
   right: 10px;
   font-size: 14px;
+}
+
+.note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 0;
 }
 
 .delete-note {

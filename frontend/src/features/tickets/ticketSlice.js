@@ -86,12 +86,12 @@ export const closeTicket = createAsyncThunk(
   }
 );
 
-export const reopenTicket = createAsyncThunk(
-  "tickets/reopen",
+export const openTicket = createAsyncThunk(
+  "tickets/open",
   async (ticketId, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await ticketService.reopenTicket(ticketId, token);
+      return await ticketService.openTicket(ticketId, token);
     } catch (error) {
       const message =
         (error.response &&
@@ -159,7 +159,7 @@ export const ticketSlice = createSlice({
             : ticket;
         });
       })
-      .addCase(reopenTicket.fulfilled, (state, action) => {
+      .addCase(openTicket.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.tickets.map((ticket) => {
