@@ -38,7 +38,7 @@ export const noteSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getNotes.pending, (state) => {
-        state.notes = null;
+        state.notes = [];
       })
       .addCase(getNotes.fulfilled, (state, action) => {
         state.notes = action.payload;
