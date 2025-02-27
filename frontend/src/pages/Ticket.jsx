@@ -6,7 +6,11 @@ import {
   closeTicket,
   reopenTicket,
 } from "../features/tickets/ticketSlice";
-import { getNotes, reset as notesReset } from "../features/notes/noteSlice";
+import {
+  createNote,
+  getNotes,
+  reset as notesReset,
+} from "../features/notes/noteSlice";
 import BackButton from "../components/BackButton";
 import Spinner from "../components/Spinner";
 import { useEffect, useState } from "react";
@@ -32,6 +36,7 @@ Modal.setAppElement("#root");
 function Ticket() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   const { ticket, isSuccess, isError, isLoading, message } = useSelector(
     (state) => state.tickets
@@ -76,10 +81,13 @@ function Ticket() {
     setIsModalOpen(false);
   };
 
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === "desc" ? "asc" : "desc");
+  };
+
   const onNoteSubmit = (e) => {
     e.preventDefault();
-    // setNoteText()
-    console.log("Submit");
+    dispatch(createNote({ noteText, ticketId }));
     closeModal();
   };
 
@@ -110,7 +118,16 @@ function Ticket() {
           <h3>Description of the issue</h3>
           <p>{ticket.description}</p>
         </div>
-        <h2>Notes</h2>
+        <hr />
+        <div className="note-header">
+          <h2>Notes</h2>
+          <button
+            className="btn btn-note-order btn-sm"
+            onClick={toggleSortOrder}
+          >
+            Show {sortOrder === "asc" ? "newest" : "oldest"} first
+          </button>
+        </div>
       </header>
 
       {ticket.status !== "closed" && (
@@ -127,9 +144,6 @@ function Ticket() {
         contentLabel="Add Note"
       >
         <h2>Add Note</h2>
-        <button className="btn-close" onClick={closeModal}>
-          X
-        </button>
         <form onSubmit={onNoteSubmit}>
           <div className="form-group">
             <textarea
@@ -141,17 +155,28 @@ function Ticket() {
               onChange={(e) => setNoteText(e.target.value)}
             ></textarea>
           </div>
-          <div className="form-group">
-            <button type="submit" className="btn">
-              Submit
-            </button>
+          <div className="modal-buttons">
+            <div className="form-group">
+              <button type="submit" className="btn">
+                Submit
+              </button>
+            </div>
+            <div className="form-group">
+              <button className="btn btn-danger" onClick={closeModal}>Cancel</button>
+            </div>
           </div>
         </form>
       </Modal>
 
       {notes.length === 0
         ? "No notes yet"
-        : notes.map((note) => <NoteItem key={note._id} note={note} />)}
+        : [...notes]
+            .sort((a, b) =>
+              sortOrder === "desc"
+                ? new Date(b.createdAt) - new Date(a.createdAt)
+                : new Date(a.createdAt) - new Date(b.createdAt)
+            )
+            .map((note) => <NoteItem key={note._id} note={note} />)}
 
       {ticket.status !== "closed" ? (
         <button className="btn btn-block btn-danger" onClick={onTicketClose}>
