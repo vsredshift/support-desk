@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import { FaSignInAlt } from "react-icons/fa";
-import { toast } from "react-toastify";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { login, reset } from "../features/auth/authSlice";
+import { FaSignInAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { login } from "../features/auth/authSlice";
 import Spinner from "../components/Spinner";
 
 function Login() {
@@ -13,24 +13,18 @@ function Login() {
   });
 
   const { email, password } = formData;
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { user, isError, isSuccess, isLoading, message } = useSelector(
-    (state) => state.auth
-  );
+  const { isLoading } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    if (isError) {
-      toast.error(message);
-    }
-
-    if(isSuccess || user) {
-      navigate("/");
-    }
-
-    dispatch(reset())
-  }, [user, isError, isSuccess, message, navigate, dispatch])
+  const onChange = (e) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -40,14 +34,13 @@ function Login() {
       password,
     };
 
-    dispatch(login(userData));
-  };
-
-  const onChange = (e) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [e.target.name]: e.target.value,
-    }));
+    dispatch(login(userData))
+      .unwrap()
+      .then((user) => {
+        toast.success(`Logged in as ${user.name}`);
+        navigate("/");
+      })
+      .catch(toast.error);
   };
 
   if (isLoading) {

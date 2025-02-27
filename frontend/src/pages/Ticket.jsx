@@ -1,23 +1,18 @@
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import { FaPlus } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Modal from "react-modal";
 import {
   getTicket,
   closeTicket,
   openTicket,
-  reset,
 } from "../features/tickets/ticketSlice";
-import {
-  createNote,
-  getNotes,
-  reset as notesReset,
-} from "../features/notes/noteSlice";
+import { createNote, getNotes } from "../features/notes/noteSlice";
+import NoteItem from "../components/NoteItem";
 import BackButton from "../components/BackButton";
 import Spinner from "../components/Spinner";
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import NoteItem from "../components/NoteItem";
-import { FaPlus } from "react-icons/fa";
 
 const customStyles = {
   content: {
@@ -39,67 +34,61 @@ function Ticket() {
   const [noteText, setNoteText] = useState("");
   const [sortOrder, setSortOrder] = useState("desc");
 
-  const { ticket, isSuccess, isError, isLoading, message } = useSelector(
-    (state) => state.tickets
-  );
-  const { notes, isLoading: notesIsLoading } = useSelector(
-    (state) => state.notes
-  );
+  const { ticket } = useSelector((state) => state.tickets);
+  const { notes } = useSelector((state) => state.notes);
 
-  const params = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const { ticketId } = params;
+  const { ticketId } = useParams();
 
   useEffect(() => {
-    if (isError) {
-      toast.error(message);
-    }
-
-    dispatch(getTicket(ticketId));
-    dispatch(getNotes(ticketId));
+    dispatch(getTicket(ticketId)).unwrap().catch(toast.error);
+    dispatch(getNotes(ticketId)).unwrap().catch(toast.error);
     // eslint-disable-next-line
-  }, [isError, message, ticketId, isSuccess]);
+  }, [ticketId, dispatch]);
 
   const onTicketClose = () => {
-    dispatch(closeTicket(ticketId));
-    toast.success("Ticket closed");
-    navigate("/tickets");
+    dispatch(closeTicket(ticketId))
+      .unwrap()
+      .then(() => {
+        toast.success("Ticket closed");
+        navigate("/tickets");
+      })
+      .catch(toast.error);
   };
 
   const onReopenTicket = () => {
-    dispatch(openTicket(ticketId));
-    toast.success("Ticket reopened");
-    navigate("/tickets");
+    dispatch(openTicket(ticketId))
+      .unwrap()
+      .then(() => {
+        toast.success("Ticket reopened");
+        navigate("/tickets");
+      })
+      .catch(toast.error);
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const toggleSortOrder = () => {
+  const toggleSortOrder = () =>
     setSortOrder(sortOrder === "desc" ? "asc" : "desc");
-  };
 
   const onNoteSubmit = (e) => {
     e.preventDefault();
-    dispatch(createNote({ noteText, ticketId }));
-    dispatch(openTicket(ticketId));
-    dispatch(reset());
-    closeModal();
+    dispatch(createNote({ noteText, ticketId }))
+      .unwrap()
+      .then(() => {
+        setNoteText("");
+      })
+      .catch(toast.error);
+    dispatch(openTicket(ticketId))
+      .unwrap()
+      .then(() => closeModal())
+      .catch(toast.error);
   };
 
-  if (isLoading || notesIsLoading) {
+  if (!ticket) {
     return <Spinner />;
-  }
-
-  if (isError) {
-    return <h3>Something went wrong</h3>;
   }
 
   return (
@@ -132,7 +121,7 @@ function Ticket() {
             Add Note
           </button>
         )}
-        {notes.length > 0 && (
+        {notes?.length > 0 && (
           <button
             className="btn btn-note-order btn-sm"
             onClick={toggleSortOrder}
@@ -175,7 +164,7 @@ function Ticket() {
         </form>
       </Modal>
 
-      {notes.length === 0
+      {notes?.length === 0
         ? "No notes yet"
         : [...notes]
             .sort((a, b) =>
